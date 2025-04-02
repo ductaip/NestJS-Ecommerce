@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Language {
+   id                   Int                   @id @default(autoincrement())
+   name                 String                @db.VarChar(500)
+   code                 String                @unique @db.VarChar(10)
+   userTranslations     UserTranslation[]
+   productTranslations  ProductTranslation[]
+   categoryTranslations CategoryTranslation[]
+   brandTranslations    BrandTranslation[]
+ 
+   createdById Int?
+   createdBy   User? @relation("LanguageCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+   updatedById Int?
+   updatedBy   User? @relation("LanguageUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+ 
+   deletedAt DateTime?
+   createdAt DateTime  @default(now())
+   updatedAt DateTime  @updatedAt
+ }
+ 
+ model User {
+   id          Int     @id @default(autoincrement())
+   email       String  @unique
+   name        String  @db.VarChar(500)
+   password    String  @db.VarChar(500)
+   phoneNumber String  @db.VarChar(50)
+   avatar      String? @db.VarChar(1000)
+ 
+   // Này có thể dùng để thực hiện chức năng quên mật khẩu, đăng nhập 2 bước
+   totpSecret                  String?               @unique @db.VarChar(1000)
+   status                      UserStatus            @default(INACTIVE)
+   roleId                      Int
+   role                        Role                  @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+   refreshTokens               RefreshToken[]
+   carts                       CartItem[]
+   orders                      Order[]
+   reviews                     Review[]
+   createdPermissions          Permission[]          @relation("PermissionCreatedBy")
+   updatedPermissions          Permission[]          @relation("PermissionUpdatedBy")
+   createdRoles                Role[]                @relation("RoleCreatedBy")
+   updatedRoles                Role[]                @relation("RoleUpdatedBy")
+   createdProducts             Product[]             @relation("ProductCreatedBy")
+   updatedProducts             Product[]             @relation("ProductUpdatedBy")
+   createdCategories           Category[]            @relation("CategoryCreatedBy")
+   updatedCategories           Category[]            @relation("CategoryUpdatedBy")
+   createdVariants             Variant[]             @relation("VariantCreatedBy")
+   updatedVariants             Variant[]             @relation("VariantUpdatedBy")
+   createdVariantOptions       VariantOption[]       @relation("VariantOptionCreatedBy")
+   updatedVariantOptions       VariantOption[]       @relation("VariantOptionUpdatedBy")
+   createdSKUS                 SKU[]                 @relation("SKUCreatedBy")
+   updatedSKUS                 SKU[]                 @relation("SKUUpdatedBy")
+   createdLanguages            Language[]            @relation("LanguageCreatedBy")
+   updatedLanguages            Language[]            @relation("LanguageUpdatedBy")
+   createdBrands               Brand[]               @relation("BrandCreatedBy")
+   updatedBrands               Brand[]               @relation("BrandUpdatedBy")
+   createdProductTranslations  ProductTranslation[]  @relation("ProductTranslationCreatedBy")
+   updatedProductTranslations  ProductTranslation[]  @relation("ProductTranslationUpdatedBy")
+   createdCategoryTranslations CategoryTranslation[] @relation("CategoryTranslationCreatedBy")
+   updatedCategoryTranslations CategoryTranslation[] @relation("CategoryTranslationUpdatedBy")
+   createdBrandTranslations    BrandTranslation[]    @relation("BrandTranslationCreatedBy")
+   updatedBrandTranslations    BrandTranslation[]    @relation("BrandTranslationUpdatedBy")
+   createdOrders               Order[]               @relation("OrderCreatedBy")
+   updatedOrders               Order[]               @relation("OrderUpdatedBy")
+   createdUserTranslations     UserTranslation[]     @relation("UserTranslationCreatedBy")
+   updatedUserTranslations     UserTranslation[]     @relation("UserTranslationUpdatedBy")
+   userTranslations            UserTranslation[]     @relation("User")
+   sentMessages                Message[]             @relation("FromUser")
+   receivedMessages            Message[]             @relation("ToUser")
+ 
+   // 1 user có thể tạo ra nhiều user khác
+   // 1 user chỉ có thể được tạo ra bởi 1 user khác
+   // Tự quan hệ 1-n
+   createdById  Int?
+   createdBy    User?  @relation("CreatorUsers", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+   createdUsers User[] @relation("CreatorUsers")
+ 
+   updatedById  Int?
+   updatedBy    User?  @relation("UpdatorUsers", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+   updatedUsers User[] @relation("UpdatorUsers")
+ 
+   deletedAt DateTime?
+   createdAt DateTime  @default(now())
+   updatedAt DateTime  @updatedAt
+ }
+ 
