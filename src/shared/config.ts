@@ -26,7 +26,7 @@ const configSchema = z.object({
 })
 
 const configServer = configSchema.safeParse(process.env)
-console.log('check', process.env)
+// console.log('check', process.env)
 
 if (!configServer.success) {
   console.log('Các giá trị khai báo trong file .env không hợp lệ')
