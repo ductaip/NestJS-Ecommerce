@@ -39,6 +39,9 @@ generator client {
    status                      UserStatus            @default(INACTIVE)
    roleId                      Int
    role                        Role                  @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+   devices                     Device[]
+   
    refreshTokens               RefreshToken[]
    carts                       CartItem[]
    orders                      Order[]
@@ -122,14 +125,29 @@ generator client {
    @@index([email, code, type])
    @@index([expiresAt])
  }
+
+ model Device {
+   id            Int            @id @default(autoincrement())
+   userId        Int
+   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+   userAgent     String
+   ip            String
+   lastActive    DateTime       @default(now()) // Thay updatedAt bằng lastActive cho ý nghĩa rõ hơn
+   createdAt     DateTime       @default(now())
+   isActive      Boolean        @default(true) // Trạng thái thiết bị (đang login hay đã logout)
+   refreshTokens RefreshToken[] // Liên kết 1-n với RefreshToken
+ }
  
  model RefreshToken {
-   token  String @unique @db.VarChar(1000)
-   userId Int
-   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
- 
-   expiresAt DateTime
-   createdAt DateTime @default(now())
+   token      String @unique @db.VarChar(1000)
+   userId     Int
+   user       User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+   deviceId   Int
+   device     Device @relation(fields: [deviceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+   expiresAt  DateTime
+   createdAt  DateTime @default(now())
  
    @@index([expiresAt])
  }
