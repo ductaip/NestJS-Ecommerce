@@ -6,6 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "email:dev": "email dev",
+    "email:build": "email build",
+    "email:export": "email export",
     "init-seed-data": "ts-node initialScript/index.ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -26,6 +29,7 @@
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.5.0",
+    "@react-email/components": "^0.0.36",
     "bcrypt": "^5.1.1",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
