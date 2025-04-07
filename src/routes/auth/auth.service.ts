@@ -107,7 +107,7 @@ export class AuthService {
   }
 
   async login(body: LoginBodyType & { userAgent: string; ip: string }) {
-    const user = await this.sharedUserRepository.findUnique({
+    const user = await this.authRepository.findUniqueUserIncludeRole({
       email: body.email,
     })
 
@@ -130,7 +130,7 @@ export class AuthService {
       ])
     }
 
-    await this.authRepository.createDevice({
+    const device = await this.authRepository.createDevice({
       userId: user.id,
       userAgent: body.userAgent,
       ip: body.ip,
@@ -138,7 +138,7 @@ export class AuthService {
 
     const tokens = await this.generateTokens({
       userId: user.id,
-      deviceId: 1,
+      deviceId: device.id,
       roleId: user.roleId,
       roleName: user.role.name,
     })
