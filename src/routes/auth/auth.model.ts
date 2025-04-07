@@ -33,7 +33,7 @@ export const RegisterResSchema = UserSchema.omit({
 
 export type RegisterResType = z.infer<typeof RegisterResSchema>
 
-export const VerificationCode = z.object({
+export const VerificationCodeSchema = z.object({
   id: z.number(),
   email: z.string().email(),
   code: z.string().length(6),
@@ -42,9 +42,9 @@ export const VerificationCode = z.object({
   createdAt: z.date(),
 })
 
-export type VerificationCodeType = z.infer<typeof VerificationCode>
+export type VerificationCodeType = z.infer<typeof VerificationCodeSchema>
 
-export const SendOTPBodySchema = VerificationCode.pick({
+export const SendOTPBodySchema = VerificationCodeSchema.pick({
   email: true,
   type: true,
 }).strict()
@@ -76,3 +76,15 @@ export type RefreshTokenBodyType = z.infer<typeof RefreshTokenBodySchema>
 export const RefreshTokenResSchema = LoginResSchema
 
 export type RefreshTokenResType = LoginResType
+
+export const DeviceSchema = z.object({
+  id: z.number(),
+  userId: z.number(),
+  userAgent: z.string(),
+  ip: z.string(),
+  lastActive: z.date(),
+  createdAt: z.date(),
+  isActive: z.boolean(),
+})
+
+export type DeviceType = z.infer<typeof DeviceSchema>
