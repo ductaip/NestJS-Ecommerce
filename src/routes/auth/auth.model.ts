@@ -1,3 +1,4 @@
+import { access } from 'fs'
 import { TypeOfVerificationCode, UserStatus } from 'src/shared/constants/auth.constant'
 import { UserSchema } from 'src/shared/models/shared-user.model'
 import { z } from 'zod'
@@ -49,3 +50,29 @@ export const SendOTPBodySchema = VerificationCode.pick({
 }).strict()
 
 export type SendOTPBodyType = z.infer<typeof SendOTPBodySchema>
+
+export const LoginBodySchema = UserSchema.pick({
+  email: true,
+  password: true,
+}).strict()
+
+export type LoginBodyType = z.infer<typeof LoginBodySchema>
+
+export const LoginResSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+})
+
+export type LoginResType = z.infer<typeof LoginResSchema>
+
+export const RefreshTokenBodySchema = z
+  .object({
+    refreshToken: z.string(),
+  })
+  .strict()
+
+export type RefreshTokenBodyType = z.infer<typeof RefreshTokenBodySchema>
+
+export const RefreshTokenResSchema = LoginResSchema
+
+export type RefreshTokenResType = LoginResType
