@@ -93,8 +93,8 @@ export class AuthRepository {
     })
   }
 
-  updateDevice(deviceId: number, data: Partial<DeviceType>): Promise<DeviceType> {
-    return this.prismaService.device.update({
+  async updateDevice(deviceId: number, data: Partial<DeviceType>): Promise<DeviceType> {
+    return await this.prismaService.device.update({
       where: {
         id: deviceId,
       },
@@ -102,8 +102,8 @@ export class AuthRepository {
     })
   }
 
-  deleteRefreshToken(where: { token: string }): Promise<RefreshTokenType> {
-    return this.prismaService.refreshToken.delete({
+  async deleteRefreshToken(where: { token: string }): Promise<RefreshTokenType> {
+    return await this.prismaService.refreshToken.delete({
       where,
     })
   }
