@@ -1,6 +1,6 @@
 import { HttpException, Injectable, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common'
 import { RolesService } from 'src/routes/auth/roles.service'
-import { generateOTP, isUniqueConstraintPrismaError } from 'src/shared/helpers'
+import { generateOTP, isNotFoundPrismaError, isUniqueConstraintPrismaError } from 'src/shared/helpers'
 import { HashingService } from 'src/shared/services/hashing.service'
 import { LoginBodyType, RefreshTokenBodyType, RegisterBodyType, SendOTPBodyType } from './auth.model'
 import { AuthRepository } from './auth.repo'
@@ -197,6 +197,7 @@ export class AuthService {
       const $tokens = this.generateTokens({ userId, roleId, roleName, deviceId })
 
       const [, , tokens] = await Promise.all([$updateDevice, $deleteRefreshToken, $tokens])
+      console.log('success', tokens)
       return tokens
     } catch (error) {
       // Trường hợp đã refresh token rồi, hãy thông báo cho user biết
@@ -208,24 +209,27 @@ export class AuthService {
     }
   }
 
-  // async logout(refreshToken: string) {
-  //   try {
-  //     // 1. Kiểm tra refreshToken có hợp lệ không
-  //     await this.tokenService.verifyRefreshToken(refreshToken)
-  //     // 2. Xóa refreshToken trong database
-  //     await this.prismaService.refreshToken.delete({
-  //       where: {
-  //         token: refreshToken,
-  //       },
-  //     })
-  //     return { message: 'Logout successfully' }
-  //   } catch (error) {
-  //     // Trường hợp đã refresh token rồi, hãy thông báo cho user biết
-  //     // refresh token của họ đã bị đánh cắp
-  //     if (isNotFoundPrismaError(error)) {
-  //       throw new UnauthorizedException('Refresh token has been revoked')
-  //     }
-  //     throw new UnauthorizedException()
-  //   }
-  // }
+  async logout(refreshToken: string) {
+    try {
+      // 1. Kiểm tra refreshToken có hợp lệ không
+      await this.tokenService.verifyRefreshToken(refreshToken)
+      // 2. Xóa refreshToken trong database
+      const { deviceId } = await this.authRepository.deleteRefreshToken({
+        token: refreshToken,
+      })
+
+      // 3. Update device is logout
+      await this.authRepository.updateDevice(deviceId, {
+        isActive: false,
+      })
+      return { message: 'Logout successfully' }
+    } catch (error) {
+      // Trường hợp đã refresh token rồi, hãy thông báo cho user biết
+      // refresh token của họ đã bị đánh cắp
+      if (isNotFoundPrismaError(error)) {
+        throw new UnauthorizedException('Refresh token has been used')
+      }
+      throw new UnauthorizedException()
+    }
+  }
 }
