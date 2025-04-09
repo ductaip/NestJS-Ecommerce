@@ -1,21 +1,13 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { AuthType, ConditionGuard } from 'src/shared/constants/auth.constant';
-import {
-  AUTH_TYPE_KEY,
-  AuthTypeDecoratorPayload,
-} from 'src/shared/decorators/auth.decorator';
-import { AccessTokenGuard } from 'src/shared/guards/access-token.guard';
-import { APIKeyGuard } from 'src/shared/guards/api-key.guard';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
+import { Reflector } from '@nestjs/core'
+import { AuthType, ConditionGuard } from 'src/shared/constants/auth.constant'
+import { AUTH_TYPE_KEY, AuthTypeDecoratorPayload } from 'src/shared/decorators/auth.decorator'
+import { AccessTokenGuard } from 'src/shared/guards/access-token.guard'
+import { APIKeyGuard } from 'src/shared/guards/api-key.guard'
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
-  private authTypeGuardMap: Record<string, CanActivate>;
+  private authTypeGuardMap: Record<string, CanActivate>
 
   constructor(
     private readonly reflector: Reflector,
@@ -26,51 +18,45 @@ export class AuthenticationGuard implements CanActivate {
       [AuthType.Bearer]: this.accessTokenGuard,
       [AuthType.APIKey]: this.apiKeyGuard,
       [AuthType.None]: { canActivate: () => true },
-    };
+    }
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log('authentication guard');
-    const authTypeValue = this.reflector.getAllAndOverride<
-      AuthTypeDecoratorPayload | undefined
-    >(AUTH_TYPE_KEY, [context.getHandler(), context.getClass()]) ?? {
-      authTypes: [AuthType.None],
+    console.log('authentication guard')
+    const authTypeValue = this.reflector.getAllAndOverride<AuthTypeDecoratorPayload | undefined>(AUTH_TYPE_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]) ?? {
+      authTypes: [AuthType.Bearer],
       options: { condition: ConditionGuard.And },
-    };
-    const guards = authTypeValue.authTypes.map(
-      (authType) => this.authTypeGuardMap[authType],
-    );
-    let error = new UnauthorizedException();
-    console.log('authTypeValue', authTypeValue);
-    console.log('guards', guards);
+    }
+    const guards = authTypeValue.authTypes.map((authType) => this.authTypeGuardMap[authType])
+    let error = new UnauthorizedException()
+
     if (authTypeValue.options.condition === ConditionGuard.Or) {
       for (const instance of guards) {
-        const canActivate = await Promise.resolve(
-          instance.canActivate(context),
-        ).catch((err) => {
-          error = err;
-          return false;
-        });
+        const canActivate = await Promise.resolve(instance.canActivate(context)).catch((err) => {
+          error = err
+          return false
+        })
         if (canActivate) {
-          return true;
+          return true
         }
       }
-      throw error;
+      throw error
     } else {
       for (const instance of guards) {
-        const canActivate = await Promise.resolve(
-          instance.canActivate(context),
-        ).catch((err) => {
-          error = err;
-          console.log('err', err, instance);
+        const canActivate = await Promise.resolve(instance.canActivate(context)).catch((err) => {
+          error = err
+          console.log('err', err, instance)
 
-          return false;
-        });
+          return false
+        })
         if (!canActivate) {
-          throw new UnauthorizedException();
+          throw new UnauthorizedException()
         }
       }
-      return true;
+      return true
     }
   }
 }

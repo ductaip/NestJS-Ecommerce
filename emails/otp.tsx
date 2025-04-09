@@ -61,12 +61,6 @@ export const OTPEmail = ({ otpCode, title, userEmail }: OTPEmailProps) => (
             <Button href="https://www.instagram.com/dwctaiph_/" style={socialButton}>
               <Img src={instagramIcon} width="36" height="36" alt="Instagram" />
             </Button>
-            <Button href="" style={socialButton}>
-              <Img src={twitterIcon} width="36" height="36" alt="Twitter" />
-            </Button>
-            <Button href="" style={socialButton}>
-              <Img src={youtubeIcon} width="36" height="36" alt="Youtube" />
-            </Button>
           </Section>
           <Text style={footerText}>Copyright © 2025 Company. All rights reserved.</Text>
         </Section>
