@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Ip, Post, Req } from '@nestjs/common'
+import { Body, Controller, Get, HttpCode, HttpStatus, Ip, Post, Query, Req, Res } from '@nestjs/common'
 
 import { AuthService } from 'src/routes/auth/auth.service'
 import {
@@ -17,6 +17,8 @@ import { UserAgent } from 'src/shared/decorators/user-agent.decorator'
 import { MessageResDTO } from 'src/shared/dtos/response.dto'
 import { IsPublic } from 'src/shared/decorators/auth.decorator'
 import { GoogleService } from './google.service'
+import envConfig from 'src/shared/config'
+import { Response } from 'express'
 
 @Controller('auth')
 export class AuthController {
@@ -74,5 +76,25 @@ export class AuthController {
   @ZodSerializerDto(GetAuthorizationUrlResDTO)
   getGoogleLink(@UserAgent() userAgent: string, @Ip() ip: string) {
     return this.googleService.getAuthorizationUrl({ userAgent, ip })
+  }
+
+  @Get('google/callback')
+  @IsPublic()
+  async googleCallback(@Query('code') code: string, @Query('state') state: string, @Res() res: Response) {
+    try {
+      const data = await this.googleService.googleCallback({
+        code,
+        state,
+      })
+      return res.redirect(
+        `${envConfig.GOOGLE_CLIENT_REDIRECT_URI}?accessToken=${data.accessToken}&refreshToken=${data.refreshToken}`,
+      )
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Đã xảy ra lỗi khi đăng nhập bằng Google, vui lòng thử lại bằng cách khác'
+      return res.redirect(`${envConfig.GOOGLE_CLIENT_REDIRECT_URI}?errorMessage=${message}`)
+    }
   }
 }

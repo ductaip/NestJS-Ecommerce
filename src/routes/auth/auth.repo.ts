@@ -10,7 +10,7 @@ export class AuthRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createUser(
-    user: Omit<RegisterBodyType, 'confirmPassword' | 'code'> & Pick<UserType, 'roleId'>,
+    user: Pick<UserType, 'email' | 'name' | 'password' | 'phoneNumber' | 'roleId'>,
   ): Promise<Omit<UserType, 'password' | 'totpSecret'>> {
     return this.prismaService.user.create({
       data: user,

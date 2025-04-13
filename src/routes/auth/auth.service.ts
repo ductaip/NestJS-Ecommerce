@@ -12,7 +12,14 @@ import { TypeOfVerificationCode } from 'src/shared/constants/auth.constant'
 import { EmailService } from 'src/shared/services/email.service'
 import { TokenService } from 'src/shared/services/token.service'
 import { AccessTokenPayloadCreate } from 'src/shared/types/jwt.type'
-import { UnauthorizedAccessException } from './auth.error'
+import {
+  EmailAlreadyExistsException,
+  EmailNotFoundException,
+  FailedToSendOTPException,
+  RefreshTokenAlreadyUsedException,
+  UnauthorizedAccessException,
+} from './auth.error'
+import { InvalidPasswordException } from 'src/shared/error'
 
 @Injectable()
 export class AuthService {
@@ -75,13 +82,11 @@ export class AuthService {
     const user = await this.sharedUserRepository.findUnique({
       email: body.email,
     })
-    if (user) {
-      throw new UnprocessableEntityException([
-        {
-          message: 'Email is already exists',
-          path: 'email',
-        },
-      ])
+    if (body.type === TypeOfVerificationCode.REGISTER && user) {
+      throw EmailAlreadyExistsException
+    }
+    if (body.type === TypeOfVerificationCode.FORGOT_PASSWORD && !user) {
+      throw EmailNotFoundException
     }
     // 2. Tạo mã OTP
     const code = generateOTP()
@@ -97,12 +102,7 @@ export class AuthService {
       code,
     })
     if (error) {
-      throw new UnprocessableEntityException([
-        {
-          message: 'Sending OTP failed',
-          path: 'code',
-        },
-      ])
+      throw FailedToSendOTPException
     }
     return { message: 'Send OTP successfully' }
   }
@@ -113,23 +113,11 @@ export class AuthService {
     })
 
     if (!user) {
-      throw new UnprocessableEntityException([
-        {
-          message: 'Email or password is incorrect',
-          path: 'email',
-        },
-      ])
+      throw EmailNotFoundException
     }
 
     const isPasswordMatch = await this.hashingService.compare(body.password, user.password)
-    if (!isPasswordMatch) {
-      throw new UnprocessableEntityException([
-        {
-          path: 'password',
-          message: 'Password is incorrect',
-        },
-      ])
-    }
+    if (!isPasswordMatch) throw InvalidPasswordException
 
     const device = await this.authRepository.createDevice({
       userId: user.id,
@@ -174,7 +162,7 @@ export class AuthService {
       // 2. Kiểm tra refreshToken có tồn tại trong database không
       const refreshTokenInDb = await this.authRepository.findUniqueRefreshTokenIncludeUserRole({ token: refreshToken })
       if (!refreshTokenInDb) {
-        throw new UnauthorizedException('Refresh token has been used')
+        throw RefreshTokenAlreadyUsedException
       }
 
       const {
@@ -227,9 +215,9 @@ export class AuthService {
       // Trường hợp đã refresh token rồi, hãy thông báo cho user biết
       // refresh token của họ đã bị đánh cắp
       if (isNotFoundPrismaError(error)) {
-        throw new UnauthorizedException('Refresh token has been used')
+        throw RefreshTokenAlreadyUsedException
       }
-      throw new UnauthorizedException()
+      throw UnauthorizedAccessException
     }
   }
 }
