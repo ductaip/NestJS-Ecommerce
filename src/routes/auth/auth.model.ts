@@ -1,6 +1,4 @@
-import e from 'express'
-import { access } from 'fs'
-import { TypeOfVerificationCode, UserStatus } from 'src/shared/constants/auth.constant'
+import { TypeOfVerificationCode } from 'src/shared/constants/auth.constant'
 import { UserSchema } from 'src/shared/models/shared-user.model'
 import { z } from 'zod'
 
