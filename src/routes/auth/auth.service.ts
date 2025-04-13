@@ -125,8 +125,8 @@ export class AuthService {
     if (!isPasswordMatch) {
       throw new UnprocessableEntityException([
         {
-          field: 'password',
-          error: 'Password is incorrect',
+          path: 'password',
+          message: 'Password is incorrect',
         },
       ])
     }
