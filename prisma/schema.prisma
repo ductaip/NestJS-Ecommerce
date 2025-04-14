@@ -115,14 +115,14 @@ generator client {
  
  model VerificationCode {
    id    Int                  @id @default(autoincrement())
-   email String               @unique @db.VarChar(500)
+   email String               @db.VarChar(500)
    code  String               @db.VarChar(50)
    type  VerificationCodeType
  
    expiresAt DateTime
    createdAt DateTime @default(now())
  
-   @@index([email, code, type])
+   @@unique([email, code, type])
    @@index([expiresAt])
  }
 
