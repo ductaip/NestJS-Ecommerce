@@ -8,9 +8,8 @@ generator client {
  }
  
  model Language {
-   id                   Int                   @id @default(autoincrement())
+   id                   String                @id @db.VarChar(10)
    name                 String                @db.VarChar(500)
-   code                 String                @unique @db.VarChar(10)
    userTranslations     UserTranslation[]
    productTranslations  ProductTranslation[]
    categoryTranslations CategoryTranslation[]
@@ -24,6 +23,8 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model User {
@@ -92,13 +93,15 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model UserTranslation {
    id          Int      @id @default(autoincrement())
    userId      Int
    user        User     @relation("User", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-   languageId  Int
+   languageId  String
    language    Language @relation(fields: [languageId], references: [id], onDelete: Cascade, onUpdate: NoAction)
    address     String?  @db.VarChar(500)
    description String?
@@ -111,6 +114,8 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model VerificationCode {
@@ -168,6 +173,8 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model Role {
@@ -186,6 +193,8 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model Product {
@@ -209,13 +218,15 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model ProductTranslation {
    id          Int      @id @default(autoincrement())
    productId   Int
    product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-   languageId  Int
+   languageId  String
    language    Language @relation(fields: [languageId], references: [id], onDelete: Cascade, onUpdate: NoAction)
    name        String   @db.VarChar(500)
    description String
@@ -228,6 +239,8 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model Category {
@@ -246,13 +259,15 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model CategoryTranslation {
    id          Int      @id @default(autoincrement())
    categoryId  Int
    category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-   languageId  Int
+   languageId  String
    language    Language @relation(fields: [languageId], references: [id], onDelete: Cascade, onUpdate: NoAction)
    name        String   @db.VarChar(500)
    description String
@@ -265,6 +280,8 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model Variant {
@@ -282,6 +299,8 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model VariantOption {
@@ -299,6 +318,8 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model SKU {
@@ -321,6 +342,8 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model Brand {
@@ -337,13 +360,15 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model BrandTranslation {
    id          Int      @id @default(autoincrement())
    brandId     Int
    brand       Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-   languageId  Int
+   languageId  String
    language    Language @relation(fields: [languageId], references: [id], onDelete: Cascade, onUpdate: NoAction)
    name        String   @db.VarChar(500)
    description String
@@ -356,6 +381,8 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model CartItem {
@@ -399,6 +426,8 @@ generator client {
    deletedAt DateTime?
    createdAt DateTime  @default(now())
    updatedAt DateTime  @updatedAt
+
+   @@index([deletedAt])
  }
  
  model Review {
