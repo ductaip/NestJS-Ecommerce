@@ -96,12 +96,7 @@ export class AuthService {
       return user
     } catch (error) {
       if (isUniqueConstraintPrismaError(error)) {
-        throw new UnprocessableEntityException([
-          {
-            message: 'Email đã tồn tại',
-            path: 'email',
-          },
-        ])
+        throw EmailAlreadyExistsException
       }
       throw error
     }
@@ -120,7 +115,7 @@ export class AuthService {
     }
     // 2. Tạo mã OTP
     const code = generateOTP()
-    const verificationCode = this.authRepository.createVerificationCode({
+    await this.authRepository.createVerificationCode({
       email: body.email,
       code,
       type: body.type,
