@@ -31,6 +31,12 @@
 $ npm install
 ```
 
+### Workflow migration đúng
+
+- Chạy `npx prisma migrate dev --create-only` để tạo file migration mới
+- Sửa file migration mới tạo
+- Chạy `npx prisma migrate dev` để áp dụng migration
+
 ## Compile and run the project
 
 ```bash
