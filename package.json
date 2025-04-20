@@ -6,10 +6,11 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "init-seed-data": "ts-node initialScript/index.ts",
+    "create-permissions": "ts-node initialScript/create-permissions.ts",
     "email:dev": "email dev",
     "email:build": "email build",
     "email:export": "email export",
-    "init-seed-data": "ts-node initialScript/index.ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
