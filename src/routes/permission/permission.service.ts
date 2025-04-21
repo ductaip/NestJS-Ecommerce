@@ -19,11 +19,11 @@ export class PermissionService {
   }
 
   async findById(id: number) {
-    const Permission = await this.permissionRepo.findById(id)
-    if (!Permission) {
+    const permission = await this.permissionRepo.findById(id)
+    if (!permission) {
       throw NotFoundRecordException
     }
-    return Permission
+    return permission
   }
 
   async create({ data, createdById }: { data: CreatePermissionBodyType; createdById: number }) {
@@ -42,12 +42,12 @@ export class PermissionService {
 
   async update({ id, data, updatedById }: { id: number; data: UpdatePermissionBodyType; updatedById: number }) {
     try {
-      const Permission = await this.permissionRepo.update({
+      const permission = await this.permissionRepo.update({
         id,
         updatedById,
         data,
       })
-      return Permission
+      return permission
     } catch (error) {
       if (isNotFoundPrismaError(error)) {
         throw NotFoundRecordException
