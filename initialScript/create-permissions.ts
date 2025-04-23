@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from 'src/app.module'
-import envConfig from 'src/shared/config'
 import { HTTPMethod, RoleName } from 'src/shared/constants/role.constant'
 import { PrismaService } from 'src/shared/services/prisma.service'
 
@@ -8,29 +7,30 @@ const prisma = new PrismaService()
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
-  await app.listen(process.env.PORT ?? 3000)
+  await app.listen(3010)
   const server = app.getHttpAdapter().getInstance()
   const router = server.router
-
   const permissionsInDb = await prisma.permission.findMany({
     where: {
       deletedAt: null,
     },
   })
-  const availableRoutes: { path: string; method: keyof typeof HTTPMethod; name: string }[] = router.stack
-    .map((layer) => {
-      if (layer.route) {
-        const path = layer.route?.path
-        const method = String(layer.route?.stack[0].method).toUpperCase() as keyof typeof HTTPMethod
-        return {
-          path,
-          method,
-          name: method + ' ' + path,
+  const availableRoutes: { path: string; method: keyof typeof HTTPMethod; name: string; module: string }[] =
+    router.stack
+      .map((layer) => {
+        if (layer.route) {
+          const path = layer.route?.path
+          const method = String(layer.route?.stack[0].method).toUpperCase() as keyof typeof HTTPMethod
+          const moduleName = String(path.split('/')[1]).toUpperCase()
+          return {
+            path,
+            method,
+            name: method + ' ' + path,
+            module: moduleName,
+          }
         }
-      }
-    })
-    .filter((item) => item !== undefined)
-
+      })
+      .filter((item) => item !== undefined)
   // Tạo object permissionInDbMap với key là [method-path]
   const permissionInDbMap: Record<string, (typeof permissionsInDb)[0]> = permissionsInDb.reduce((acc, item) => {
     acc[`${item.method}-${item.path}`] = item
@@ -63,7 +63,6 @@ async function bootstrap() {
   const routesToAdd = availableRoutes.filter((item) => {
     return !permissionInDbMap[`${item.method}-${item.path}`]
   })
-
   // Thêm các routes này dưới dạng permissions database
   if (routesToAdd.length > 0) {
     const permissionsToAdd = await prisma.permission.createMany({
@@ -98,6 +97,7 @@ async function bootstrap() {
       },
     },
   })
+
   process.exit(0)
 }
 bootstrap()
