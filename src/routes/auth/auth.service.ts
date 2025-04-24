@@ -106,6 +106,7 @@ export class AuthService {
     // 1. Kiểm tra email đã tồn tại trong database chưa
     const user = await this.sharedUserRepository.findUnique({
       email: body.email,
+      deletedAt: null,
     })
     if (body.type === TypeOfVerificationCode.REGISTER && user) {
       throw EmailAlreadyExistsException
@@ -135,6 +136,7 @@ export class AuthService {
   async login(body: LoginBodyType & { userAgent: string; ip: string }) {
     const user = await this.authRepository.findUniqueUserIncludeRole({
       email: body.email,
+      deletedAt: null,
     })
 
     if (!user) {
@@ -251,6 +253,7 @@ export class AuthService {
     // 1. Kiểm tra email đã tồn tại trong database chưa
     const user = await this.sharedUserRepository.findUnique({
       email,
+      deletedAt: null,
     })
     if (!user) {
       throw EmailNotFoundException
@@ -265,9 +268,10 @@ export class AuthService {
     const hashedPassword = await this.hashingService.hash(newPassword)
     await Promise.all([
       this.sharedUserRepository.update(
-        { id: user.id },
+        { id: user.id, deletedAt: null },
         {
           password: hashedPassword,
+          updatedById: user.id,
         },
       ),
       this.authRepository.deleteVerificationCode({
