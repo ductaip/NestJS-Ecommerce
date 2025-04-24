@@ -27,3 +27,4 @@ export const TypeOfVerificationCode = {
 } as const
 
 export type TypeOfVerificationCodeType = (typeof TypeOfVerificationCode)[keyof typeof TypeOfVerificationCode]
+export const REQUEST_ROLE_PERMISSIONS = 'role_permissions'
