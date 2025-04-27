@@ -17,6 +17,7 @@ import path from 'path'
 import envConfig from 'src/shared/config'
 import { UPLOAD_DIR } from 'src/shared/constants/other.constant'
 import { IsPublic } from 'src/shared/decorators/auth.decorator'
+import { ParseFilePipeWithUnlink } from './parse-file.pipe'
 
 @Controller('media')
 export class MediaController {
@@ -30,7 +31,7 @@ export class MediaController {
   )
   uploadFile(
     @UploadedFiles(
-      new ParseFilePipe({
+      new ParseFilePipeWithUnlink({
         validators: [
           new MaxFileSizeValidator({ maxSize: 2 * 1024 * 1024 }), // 2MB
           new FileTypeValidator({ fileType: /(jpg|jpeg|png|webp)$/ }),

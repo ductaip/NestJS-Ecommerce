@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core'
 import { SharedUserRepository } from './repositories/shared-user.repo'
 import { EmailService } from './services/email.service'
 import { SharedRoleRepository } from './repositories/shared-role.repo'
+// import { S3Service } from './services/s3.service'
 
 const sharedServices = [
   PrismaService,
@@ -18,6 +19,7 @@ const sharedServices = [
   EmailService,
   SharedUserRepository,
   SharedRoleRepository,
+  // S3Service,
 ]
 @Global()
 @Module({
