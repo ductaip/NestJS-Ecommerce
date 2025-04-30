@@ -135,6 +135,7 @@ export class AuthRepository {
           }
         },
   ): Promise<VerificationCodeType> {
+    // console.log('>>>>', uniqueValue)
     return this.prismaService.verificationCode.delete({
       where: uniqueValue,
     })

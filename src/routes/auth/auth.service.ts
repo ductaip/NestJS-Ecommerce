@@ -75,7 +75,6 @@ export class AuthService {
 
       const clientRoleId = await this.sharedRoleRepository.getClientRoleId()
       const hashedPassword = await this.hashingService.hash(body.password)
-
       const [user] = await Promise.all([
         this.authRepository.createUser({
           email: body.email,
@@ -89,7 +88,7 @@ export class AuthService {
           email_code_type: {
             email: body.email,
             code: body.code,
-            type: TypeOfVerificationCode.FORGOT_PASSWORD,
+            type: TypeOfVerificationCode.REGISTER,
           },
         }),
       ])
