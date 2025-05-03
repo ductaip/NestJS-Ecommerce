@@ -41,7 +41,6 @@ generator json {
    phoneNumber String  @db.VarChar(50)
    avatar      String? @db.VarChar(1000)
  
-   // Này có thể dùng để thực hiện chức năng quên mật khẩu, đăng nhập 2 bước
    totpSecret                  String?               @db.VarChar(1000)
    status                      UserStatus            @default(INACTIVE)
    roleId                      Int
