@@ -85,6 +85,8 @@ generator json {
    createdOrders               Order[]               @relation("OrderCreatedBy")
    updatedOrders               Order[]               @relation("OrderUpdatedBy")
    deletedOrders               Order[]               @relation("OrderDeletedBy")
+   soldOrders                  Order[]               @relation("Shop")
+
    createdUserTranslations     UserTranslation[]     @relation("UserTranslationCreatedBy")
    updatedUserTranslations     UserTranslation[]     @relation("UserTranslationUpdatedBy")
    deletedUserTranslations     UserTranslation[]     @relation("UserTranslationDeletedBy")
@@ -234,6 +236,8 @@ generator json {
    reviews             Review[]
    productTranslations ProductTranslation[]
    orders              Order[]
+   productSKUSnapshots ProductSKUSnapshot[]
+
 
 
  
@@ -397,20 +401,28 @@ generator json {
    createdAt DateTime @default(now())
    updatedAt DateTime @updatedAt
 
+   @@unique([userId, skuId])
    @@index([userId])
  }
  
  model ProductSKUSnapshot {
    id          Int      @id @default(autoincrement())
    productName String   @db.VarChar(500)
-   price       Float
-   images      String[]
+   skuPrice    Float
+
+   image      String
    skuValue    String   @db.VarChar(500)
    skuId       Int?
    sku         SKU?     @relation(fields: [skuId], references: [id], onDelete: SetNull, onUpdate: NoAction)
    orderId     Int?
    order       Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull, onUpdate: NoAction)
  
+   quantity            Int
+   productId           Int?
+   product             Product? @relation(fields: [productId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+   /// [ProductTranslations]
+   productTranslations Json
+
    createdAt DateTime @default(now())
  }
  
@@ -422,7 +434,10 @@ generator json {
    items  ProductSKUSnapshot[]
    products Product[]
 
-
+   /// [Receiver]
+   receiver    Json
+   shopId      Int?
+   shop        User?                @relation("Shop", fields: [shopId], references: [id], onDelete: SetNull, onUpdate: NoAction)
  
    createdById Int?
    createdBy   User? @relation("OrderCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
@@ -481,7 +496,7 @@ generator json {
  }
  
  enum OrderStatus {
-   PENDING_CONFIRMATION
+   PENDING_PAYMENT
    PENDING_PICKUP
    PENDING_DELIVERY
    DELIVERED
