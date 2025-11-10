@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: ecommerce-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecommerce
+    username: ecommerce
+    password: ecommerce
+  sql:
+    init:
+      mode: always
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+    open-in-view: false
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+app:
+  security:
+    jwt:
+      secret: "S3cr3tKeyS3cr3tKeyS3cr3tKeyS3cr3tKey"
+      expiration-hours: 24
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
